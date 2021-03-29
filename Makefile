@@ -1,5 +1,5 @@
 run: build
-	docker run -it --rm stojg/postgres-backup-s3
+	docker run --env-file .env -it --rm stojg/postgres-backup-s3
 
 build:
 	docker build . -t stojg/postgres-backup-s3

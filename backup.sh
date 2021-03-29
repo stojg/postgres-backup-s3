@@ -1,6 +1,7 @@
 #! /bin/sh
 
 set -e
+set -u
 set -o pipefail
 
 if [ "${S3_ACCESS_KEY_ID}" = "**None**" ]; then
