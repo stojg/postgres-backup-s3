@@ -56,11 +56,15 @@ export AWS_SECRET_ACCESS_KEY=$S3_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=$S3_REGION
 
 export PGPASSWORD=$POSTGRES_PASSWORD
-POSTGRES_HOST_OPTS="-h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTGRES_EXTRA_OPTS -Fc"
+POSTGRES_HOST_OPTS="-h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTGRES_EXTRA_OPTS -Fc -Z 9"
 
 echo "Creating dump of ${POSTGRES_DATABASE} database from ${POSTGRES_HOST}..."
 
-pg_dump $POSTGRES_HOST_OPTS --compress 9 -Fc $POSTGRES_DATABASE > ./db.dump
+set -x
+pg_dump $POSTGRES_HOST_OPTS $POSTGRES_DATABASE > ./db.dump
+set +x
+
+echo "./db.dump $(numfmt --to=iec-i --suffix=B $(stat -c "%s" ./db.dump))"
 
 echo "Uploading dump to $S3_BUCKET"
 
