@@ -60,7 +60,7 @@ POSTGRES_HOST_OPTS="-h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTG
 
 echo "Creating dump of ${POSTGRES_DATABASE} database from ${POSTGRES_HOST}..."
 
-pg_dump $POSTGRES_HOST_OPTS -Fc $POSTGRES_DATABASE > ./db.dump
+pg_dump $POSTGRES_HOST_OPTS --compress 9 -Fc $POSTGRES_DATABASE > ./db.dump
 
 echo "Uploading dump to $S3_BUCKET"
 
