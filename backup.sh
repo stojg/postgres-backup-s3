@@ -58,19 +58,22 @@ export AWS_DEFAULT_REGION=$S3_REGION
 export PGPASSWORD=$POSTGRES_PASSWORD
 POSTGRES_HOST_OPTS="-h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTGRES_EXTRA_OPTS -Fc -Z 9"
 
-echo "Creating dump of database '${POSTGRES_DATABASE}' from '${POSTGRES_HOST}'..."
+TIME_STAMP=$(date +"%Y-%m-%dT%H:%M:%SZ")
+echo "checking connection to bucket.."
+echo 'backup running' | aws $AWS_ARGS s3 cp - s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_${TIME_STAMP}.log
+echo "access to bucket confirmed"
+
+echo "creating dump of database '${POSTGRES_DATABASE}' from '${POSTGRES_HOST}'..."
 
 set -x
-pg_dump $POSTGRES_HOST_OPTS $POSTGRES_DATABASE > ./db.dump
+pg_dump $POSTGRES_HOST_OPTS $POSTGRES_DATABASE | aws $AWS_ARGS s3 cp - s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_${TIME_STAMP}.dump
 set +x
 
-echo "./db.dump $(numfmt --to=iec-i --suffix=B $(stat -c "%s" ./db.dump))"
+echo "database backed up and stored in bucket"
 
-echo "Uploading dump to $S3_BUCKET"
-
-TIME_STAMP=$(date +"%Y-%m-%dT%H:%M:%SZ")
-aws $AWS_ARGS s3 cp db.dump s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_${TIME_STAMP}.dump || exit 2
+echo "copying to latest"
 
 aws $AWS_ARGS s3 cp s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_${TIME_STAMP}.dump s3://$S3_BUCKET/$S3_PREFIX/latest.dump
 
-echo "SQL backup uploaded successfully"
+echo
+echo "everything is peachy, have a good day"
