@@ -74,6 +74,7 @@ echo "database backed up and stored in bucket"
 echo "copying to latest"
 
 aws $AWS_ARGS s3 cp s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_${TIME_STAMP}.dump s3://$S3_BUCKET/$S3_PREFIX/latest.dump
+date '+%s' | aws $AWS_ARGS s3 cp - s3://$S3_BUCKET/$S3_PREFIX/latest.log
 
 echo
 echo "everything is peachy, have a good day"
